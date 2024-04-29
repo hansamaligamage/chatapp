@@ -11,7 +11,7 @@
         $.post("/Chat/GetResponseFromPDF", { userMessage: userMessage }, function (data) {
             debugger;
             $("#chatBox").append("<p> User : " + userMessage + "</p>");
-            $("#chatBox").append("<p> Cazton AI : " + data.response + "</p>");
+            $("#chatBox").append("<p> AI Response : " + data.response + "</p>");
         });
 
     }

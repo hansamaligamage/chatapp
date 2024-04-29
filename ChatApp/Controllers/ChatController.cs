@@ -32,8 +32,6 @@ namespace ChatApp.Controllers
             var chatCompletionOPtions = new ChatCompletionsOptions() { 
                 Messages = {
                     new ChatRequestSystemMessage("You are a helpful assistant"),
-                    //new ChatRequestUserMessage("Does Azure OpenAI support GPT-4"),
-                    //new ChatRequestAssistantMessage("Yes, it does"),
                     new ChatRequestUserMessage(userMessage),
                     },
                 MaxTokens = 400,  //This is little faster than usual
@@ -49,20 +47,18 @@ namespace ChatApp.Controllers
         public async Task<IActionResult> GetResponseFromPDF(string userMessage)
         {
             var client = new OpenAIClient(new Uri(endpoint), new AzureKeyCredential(key));
-            var pdfPath = @"C:\Users\Hansamali Gamage\Desktop\data\original.pdf";
+            var pdfPath = @"C:\Users\HansamaliG\Desktop\data\original.pdf";
             var pdfText = GetText(pdfPath);
             var chatCompletionOPtions = new ChatCompletionsOptions()
             {
                 Messages = {
                     new ChatRequestSystemMessage("You are a helpful assistant"),
-                    //new ChatRequestUserMessage("Does Azure OpenAI support GPT-4"),
-                    //new ChatRequestAssistantMessage("Yes, it does"),
                     new ChatRequestUserMessage($"The following information is from the PDF text: {pdfText}"),
                     new ChatRequestUserMessage(userMessage),
                     },
                 MaxTokens = 1000,
-                DeploymentName = model,
-                Temperature = 0 //More fractual not more creative
+                DeploymentName = model
+                //Temperature = 0 //More fractual not more creative
             };
 
             var response = await client.GetChatCompletionsAsync(chatCompletionOPtions);
@@ -72,14 +68,14 @@ namespace ChatApp.Controllers
 
         private static string GetText(string filePath)
         {
-            PdfDocument pdfDoc = new PdfDocument(new PdfReader(filePath));
-            StringBuilder text = new StringBuilder();
-
-            for (var page = 1; page <= pdfDoc.GetNumberOfPages(); page++)
+            var pdfDoc = new PdfDocument(new PdfReader(filePath));
+            var text = new StringBuilder();
+            var pages = pdfDoc.GetNumberOfPages() / 2;
+            for (var page = 1; page <= pages; page++)
             {
-                PdfPage pdfPage = pdfDoc.GetPage(page);
-                ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
-                string currentText = PdfTextExtractor.GetTextFromPage(pdfPage, strategy);
+                var pdfPage = pdfDoc.GetPage(page);
+                var strategy = new SimpleTextExtractionStrategy();
+                var currentText = PdfTextExtractor.GetTextFromPage(pdfPage, strategy);
                 text.Append(currentText);
             }
             pdfDoc.Close();
